@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Диагностика: Задание №6 ОГЭ по информатике (Python)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --border: #21262d;
+    --border-soft: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --blue: #58a6ff;
+    --blue-strong: #1f6feb;
+    --red: #f85149;
+    --green: #3fb950;
+    --purple: #a371f7;
+    --white-flag: #f0f6fc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 150px; }
+  body {
+    font-family: 'Inter', -apple-system, 'Segoe UI', Arial, sans-serif;
+    background: var(--bg);
+    background-image:
+      radial-gradient(60rem 30rem at 120% -10%, rgba(88,166,255,.08), transparent),
+      radial-gradient(50rem 26rem at -10% 0%, rgba(248,81,73,.06), transparent);
+    background-attachment: fixed;
+    color: var(--text);
+    line-height: 1.5;
+    padding-bottom: 110px;
+  }
+
+  header.site-header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(13,17,23,.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .flag-line {
+    height: 3px;
+    background: linear-gradient(90deg, var(--white-flag) 0 33.3%, var(--blue) 33.3% 66.6%, var(--red) 66.6% 100%);
+  }
+  .header-inner {
+    max-width: 1280px; margin: 0 auto;
+    padding: 14px 20px 12px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+  .header-left h1 { font-size: 1.02rem; font-weight: 700; line-height: 1.35; }
+  .header-left p { font-size: .78rem; color: var(--text-dim); margin-top: 2px; }
+  .controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .timer {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem; font-weight: 600;
+    padding: 7px 16px; border-radius: 8px;
+    background: var(--bg-card); border: 1px solid var(--border-soft);
+    color: var(--blue);
+  }
+  .timer.timer-danger {
+    color: #fff; background: rgba(248,81,73,.18);
+    border-color: var(--red); animation: pulse .9s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.65} }
+
+  .progress-wrap {
+    max-width: 1280px; margin: 0 auto; padding: 0 20px 12px;
+  }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    font-size: .75rem; color: var(--text-dim); margin-bottom: 5px;
+  }
+  .progress-label b { color: var(--blue); font-weight: 700; }
+  .progress-track {
+    height: 6px; border-radius: 999px; background: var(--bg-card);
+    border: 1px solid var(--border); overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--green), var(--blue));
+    transition: width .35s ease;
+  }
+
+  .btn {
+    font-family: inherit; font-size: .95rem; font-weight: 600;
+    padding: 10px 18px; min-height: 44px;
+    border-radius: 8px; border: 1px solid var(--border-soft);
+    cursor: pointer; transition: background .15s, border-color .15s, transform .1s;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-ghost { background: var(--bg-card); color: var(--text); }
+  .btn-ghost:hover { background: #21262d; border-color: #484f58; }
+  .btn-primary { background: var(--blue-strong); border-color: var(--blue-strong); color: #fff; }
+  .btn-primary:hover { background: #388bfd; }
+  .btn-danger { background: rgba(248,81,73,.15); border-color: var(--red); color: var(--red); }
+  .btn-danger:hover { background: rgba(248,81,73,.28); }
+
+  .instruction {
+    position: sticky; top: 116px; z-index: 40;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+  }
+  .instruction-inner {
+    max-width: 1280px; margin: 0 auto;
+    font-size: .9rem; color: var(--text);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .instruction-inner::before {
+    content: ''; flex: none;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--blue); box-shadow: 0 0 0 4px rgba(88,166,255,.15);
+  }
+
+  main { max-width: 1280px; margin: 24px auto 0; padding: 0 20px; }
+  .grid {
+    display: grid; gap: 20px;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: start;
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 16px 20px;
+    display: flex; flex-direction: column; gap: 12px;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+  }
+  .card:hover {
+    border-color: var(--border-soft);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,.35), 0 0 0 1px rgba(88,166,255,.06);
+  }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .badge {
+    font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    color: #fff; padding: 4px 10px; border-radius: 999px;
+  }
+  .badge-lvl-1 { background: var(--green); box-shadow: 0 0 12px rgba(63,185,80,.35); }
+  .badge-lvl-2 { background: var(--blue-strong); box-shadow: 0 0 12px rgba(88,166,255,.3); }
+  .badge-lvl-3 { background: var(--purple); box-shadow: 0 0 12px rgba(163,113,247,.35); }
+  .task-num { font-size: .82rem; font-weight: 700; color: var(--text-dim); }
+
+  .code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .78rem; line-height: 1.55;
+    background: #0d1117; border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px;
+    overflow-x: auto; white-space: pre;
+  }
+  .tk-kw { color: var(--red); font-weight: 600; }
+  .tk-fn { color: var(--purple); }
+  .tk-str { color: var(--green); }
+  .tk-num { color: var(--blue); }
+
+  .runs { font-size: .8rem; color: var(--text-dim); }
+  .runs b { color: var(--blue); font-weight: 600; }
+  .question { font-size: .9rem; font-weight: 500; }
+
+  fieldset.card-input { border: none; padding: 0; margin-top: auto; }
+  legend { font-size: .72rem; color: var(--text-dim); margin-bottom: 6px; padding: 0; }
+  .task-input {
+    width: 100%; height: 48px;
+    font-family: 'JetBrains Mono', monospace; font-size: 1.1rem;
+    text-align: center;
+    background: #0d1117; color: var(--text);
+    border: 2px solid var(--border-soft); border-radius: 10px;
+    transition: border-color .15s, box-shadow .15s;
+    appearance: textfield;
+  }
+  .task-input::-webkit-outer-spin-button,
+  .task-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .task-input:focus {
+    outline: none; border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(88,166,255,.2);
+  }
+  .task-input.invalid { border-color: var(--red); box-shadow: 0 0 0 3px rgba(248,81,73,.18); }
+  .task-input:disabled { background: #0a0d12; color: #4b5563; border-color: var(--border); }
+
+  footer.site-footer {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+    background: rgba(13,17,23,.94);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border);
+    padding: 12px 20px;
+  }
+  .footer-inner { max-width: 1280px; margin: 0 auto; display: flex; justify-content: center; }
+  #check-btn { min-width: 320px; }
+
+  .overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(1,4,9,.72);
+    backdrop-filter: blur(4px);
+    display: none; align-items: flex-start; justify-content: center;
+    padding: 24px 16px; overflow-y: auto;
+  }
+  .overlay.open { display: flex; }
+  .modal {
+    background: var(--bg-card);
+    border: 1px solid var(--border-soft);
+    border-radius: 18px;
+    max-width: 660px; width: 100%; margin: auto;
+    padding: 30px 28px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.55), 0 0 0 1px rgba(88,166,255,.06);
+    position: relative;
+  }
+  .modal-close {
+    position: absolute; top: 14px; right: 14px;
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid var(--border-soft);
+    background: var(--bg); color: var(--text-dim);
+    font-size: 1.2rem; cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .modal-close:hover { background: #21262d; color: var(--text); }
+  .modal h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 18px; }
+  .stats {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px;
+  }
+  .stat {
+    background: #0d1117; border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 10px; text-align: center;
+  }
+  .stat .val { font-size: 1.4rem; font-weight: 800; display: block; color: var(--text); }
+  .stat .lbl {
+    font-size: .68rem; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: .05em; margin-top: 2px;
+  }
+  #stat-score { color: var(--blue); }
+  #stat-percent { color: var(--green); }
+  #stat-time { color: var(--purple); }
+
+  .level-box {
+    text-align: center;
+    background: #0d1117; border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px; margin-bottom: 14px;
+  }
+  .level-title { font-size: 1.5rem; font-weight: 800; }
+  .level-desc { color: var(--text-dim); margin-top: 6px; }
+  .recommend {
+    background: rgba(88,166,255,.08); border: 1px solid rgba(88,166,255,.25);
+    border-radius: 12px; padding: 12px 16px; font-size: .88rem; margin-bottom: 18px;
+  }
+  .recommend b { color: var(--blue); }
+  .errors-table { width: 100%; border-collapse: collapse; font-size: .88rem; margin-bottom: 20px; }
+  .errors-table th, .errors-table td {
+    border: 1px solid var(--border); padding: 8px 10px; text-align: center;
+  }
+  .errors-table th { background: #0d1117; color: var(--text-dim); font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; }
+  .errors-table td { background: var(--bg-card); }
+  .errors-table tr.incorrect td { background: rgba(248,81,73,.12); }
+  .modal-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+
+  @media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 720px) {
+    .grid { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr 1fr 1fr; }
+    #check-btn { min-width: 0; width: 100%; }
+    .instruction { top: 154px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="flag-line"></div>
+  <div class="header-inner">
+    <div class="header-left">
+      <h1>Диагностика: Задание №6 ОГЭ по информатике (Python)</h1>
+      <p>Тренировка в формате экзамена · 9 заданий · 40 минут</p>
+    </div>
+    <div class="controls">
+      <span class="timer" id="timer" role="timer" aria-live="off">40:00</span>
+      <button class="btn btn-ghost" id="reset-btn" type="button">Сброс</button>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>Прогресс выполнения:</span>
+      <span id="progress-num">Выполнено 0 из 9</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" role="progressbar" aria-valuemin="0" aria-valuemax="9" aria-valuenow="0"></div>
+    </div>
+  </div>
+</header>
+
+<section class="instruction" aria-label="Инструкция">
+  <div class="instruction-inner">
+    Введите только целое число — количество раз, которое программа выведет «YES» или «NO», либо искомое значение переменной A. Ответы сохраняются автоматически.
+  </div>
+</section>
+
+<main>
+  <div class="grid" id="tasks-grid" role="list"></div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <button class="btn btn-primary" id="check-btn" type="button">Проверить работу (F9)</button>
+  </div>
+</footer>
+
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" id="result-modal">
+    <button class="modal-close" id="modal-close" type="button" aria-label="Закрыть">×</button>
+    <h2 id="modal-title">Результаты диагностики</h2>
+    <div class="stats">
+      <div class="stat"><span class="val" id="stat-score">–</span><span class="lbl">Ваш балл</span></div>
+      <div class="stat"><span class="val" id="stat-percent">–</span><span class="lbl">Выполнение</span></div>
+      <div class="stat"><span class="val" id="stat-time">–</span><span class="lbl">Время решения</span></div>
+    </div>
+    <div class="level-box">
+      <div class="level-title" id="level-title">–</div>
+      <div class="level-desc" id="level-desc"></div>
+    </div>
+    <div class="recommend" id="recommend"></div>
+    <table class="errors-table" aria-label="Детализация ошибок">
+      <thead><tr><th>№ задания</th><th>Ваш ответ</th><th>Правильный ответ</th></tr></thead>
+      <tbody id="errors-body"></tbody>
+    </table>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="close-btn" type="button">Закрыть</button>
+      <button class="btn btn-ghost" id="copy-btn" type="button">Скопировать результат</button>
+      <button class="btn btn-danger" id="restart-btn" type="button">Начать заново</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var DURATION_MS = 40 * 60 * 1000;
+  var KEYS = { 1: 2, 2: 3, 3: 4, 4: 4, 5: 4, 6: 3, 7: 2, 8: 3, 9: 4 };
+  var STORE_KEY = 'oge-task6-diagnostics-v1';
+
+  var LEVELS = [
+    {
+      name: 'Базовый', color: 'var(--green)',
+      desc: 'Не понимает логические операции и трассировку.',
+      rec: 'Повторите условный оператор if, логические операции and, or и таблицы истинности. Отработайте трассировку простых программ на бумаге.',
+      min: 0, max: 3
+    },
+    {
+      name: 'Повышенный', color: 'var(--blue)',
+      desc: 'Решает простые задачи, но «плывёт» с параметром A.',
+      rec: 'Отработайте задания с параметром A: метод перебора значений и метод границ. Разберите, как меняется результат при изменении A.',
+      min: 4, max: 6
+    },
+    {
+      name: 'Высокий', color: 'var(--purple)',
+      desc: 'Уверенно работает с параметром и отрицаниями.',
+      rec: 'Переходите к задачам ФИПИ повышенной сложности и готовьтесь к №16. Внимательно разберите задания, в которых были ошибки.',
+      min: 7, max: 9
+    }
+  ];
+
+  var TASKS = [
+    {
+      level: 1, num: 1,
+      code: 's = int(input())\nt = int(input())\nif s > 5 or t > 5:\n    print("YES")\nelse:\n    print("NO")',
+      runs: [[1, 2], [2, 6], [3, 4], [6, 3], [5, 5]],
+      question: 'Было проведено 5 запусков. Сколько раз напечатано «YES»?',
+      max: 5
+    },
+    {
+      level: 1, num: 2,
+      code: 's = int(input())\nt = int(input())\nif s < 4 and t < 4:\n    print("YES")\nelse:\n    print("NO")',
+      runs: [[3, 3], [5, 2], [2, 5], [1, 1], [4, 4]],
+      question: 'Было проведено 5 запусков. Сколько раз напечатано «NO»?',
+      max: 5
+    },
+    {
+      level: 1, num: 3,
+      code: 's = int(input())\nt = int(input())\nif s != 3 or t == 6:\n    print("YES")\nelse:\n    print("NO")',
+      runs: [[3, 6], [4, 6], [3, 5], [2, 3], [6, 3]],
+      question: 'Было проведено 5 запусков. Сколько раз напечатано «YES»?',
+      max: 5
+    },
+    {
+      level: 2, num: 4, note: 'A = 5.',
+      code: 's = int(input())\nt = int(input())\nA = int(input())\nif s > A or t > 8:\n    print("YES")\nelse:\n    print("NO")',
+      runs: [[3, 9], [6, 2], [5, 5], [7, 1], [4, 8], [8, 3]],
+      question: 'Было проведено 6 запусков. Сколько раз напечатано «YES»?',
+      max: 6
+    },
+    {
+      level: 2, num: 5, note: 'A = 6.',
+      code: 's = int(input())\nt = int(input())\nA = int(input())\nif s < A and t < 7:\n    print("YES")\nelse:\n    print("NO")',
+      runs: [[5, 6], [7, 5], [3, 8], [4, 4], [6, 6], [2, 9]],
+      question: 'Было проведено 6 запусков. Сколько раз напечатано «NO»?',
+      max: 6
+    },
+    {
+      level: 2, num: 6, note: 'A = 4.',
+      code: 's = int(input())\nt = int(input())\nA = int(input())\nif s <= A or t >= 5:\n    print("YES")\nelse:\n    print("NO")',
+      runs: [[3, 6], [7, 2], [4, 4], [9, 1], [2, 7], [6, 3]],
+      question: 'Было проведено 6 запусков. Сколько раз напечатано «YES»?',
+      max: 6
+    },
+    {
+      level: 3, num: 7,
+      code: 's = int(input())\nt = int(input())\nA = int(input())\nif not (s >= A and t < 4):\n    print("YES")\nelse:\n    print("NO")',
+      runs: [[2, 1], [5, 6], [3, 2], [7, 1], [1, 5], [4, 3], [6, 7], [0, 8]],
+      question: 'Было проведено 8 запусков. Укажите наибольшее целое A, при котором «YES» напечатано ровно 4 раза.',
+      max: 20
+    },
+    {
+      level: 3, num: 8,
+      code: 's = int(input())\nt = int(input())\nA = int(input())\nif (s > A or t > 5) and not (s < 2):\n    print("YES")\nelse:\n    print("NO")',
+      runs: [[1, 7], [4, 3], [6, 8], [3, 2], [0, 6], [5, 7], [7, 4], [2, 1], [8, 5]],
+      question: 'Было проведено 9 запусков. Укажите наименьшее целое A, при котором «NO» напечатано ровно 4 раза.',
+      max: 20
+    },
+    {
+      level: 3, num: 9,
+      code: 's = int(input())\nt = int(input())\nA = int(input())\nif s < A or t < A:\n    print("YES")\nelse:\n    print("NO")',
+      runs: [[1, 8], [9, 2], [4, 6], [7, 1], [3, 9], [5, 5], [2, 4], [8, 7], [6, 3]],
+      question: 'Было проведено 9 запусков. Укажите наименьшее целое A, при котором «YES» напечатано ровно 6 раз.',
+      max: 20
+    }
+  ];
+
+  var LEVEL_LABEL = { 1: 'Базовый', 2: 'Повышенный', 3: 'Высокий' };
+
+  var inputs = [];
+  var timerInterval = null;
+  var checkBtn = document.getElementById('check-btn');
+  var resetBtn = document.getElementById('reset-btn');
+  var overlay = document.getElementById('overlay');
+  var modalClose = document.getElementById('modal-close');
+  var closeBtn = document.getElementById('close-btn');
+  var copyBtn = document.getElementById('copy-btn');
+  var restartBtn = document.getElementById('restart-btn');
+  var timerEl = document.getElementById('timer');
+  var progressFill = document.getElementById('progress-fill');
+  var progressNum = document.getElementById('progress-num');
+  var state = loadState();
+
+  function loadState() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY)) || null; }
+    catch (e) { return null; }
+  }
+  function saveState() {
+    var answers = {};
+    inputs.forEach(function (el, i) { answers[TASKS[i].num] = el.value; });
+    state = { answers: answers, startAt: state.startAt, endAt: state.endAt };
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  function highlight(code) {
+    return code
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/\b(if|elif|else|and|or|not)\b/g, '<span class="tk-kw">$1</span>')
+      .replace(/\b(int|input|print)\b/g, '<span class="tk-fn">$1</span>')
+      .replace(/\b\d+\b/g, '<span class="tk-num">$1</span>')
+      .replace(/("YES"|"NO")/g, '<span class="tk-str">$1</span>');
+  }
+
+  function formatRuns(task) {
+    var note = task.note ? '<b>' + task.note + '</b> ' : '';
+    var pairs = task.runs.map(function (r) { return '(' + r.join(', ') + ')'; }).join('; ');
+    return 'Входные данные: ' + note + pairs;
+  }
+
+  function updateProgress() {
+    var done = inputs.filter(function (el) { return el.value.trim() !== ''; }).length;
+    progressFill.style.width = (done / 9 * 100) + '%';
+    progressNum.textContent = 'Выполнено ' + done + ' из 9';
+    progressFill.setAttribute('aria-valuenow', done);
+  }
+
+  function buildCards() {
+    var grid = document.getElementById('tasks-grid');
+    TASKS.forEach(function (task) {
+      var card = document.createElement('article');
+      card.className = 'card';
+      card.setAttribute('role', 'listitem');
+      card.innerHTML =
+        '<div class="card-head">' +
+          '<span class="badge badge-lvl-' + task.level + '">' + LEVEL_LABEL[task.level] + '</span>' +
+          '<span class="task-num">№ ' + task.num + '</span>' +
+        '</div>' +
+        '<pre class="code"><code>' + highlight(task.code) + '</code></pre>' +
+        '<p class="runs">' + formatRuns(task) + '</p>' +
+        '<p class="question">' + task.question + '</p>' +
+        '<fieldset class="card-input">' +
+          '<legend>Введите ответ</legend>' +
+          '<input type="number" class="task-input" id="task-input-' + task.num + '" ' +
+            'min="0" max="' + task.max + '" step="1" inputmode="numeric" ' +
+            'aria-label="Ответ на задание ' + task.num + '">' +
+        '</fieldset>';
+      grid.appendChild(card);
+      var input = card.querySelector('.task-input');
+      input.addEventListener('input', function () {
+        input.classList.remove('invalid');
+        saveState();
+        updateProgress();
+      });
+      inputs.push(input);
+    });
+  }
+
+  function restoreAnswers() {
+    if (!state || !state.answers) return;
+    inputs.forEach(function (el, i) {
+      var v = state.answers[TASKS[i].num];
+      if (v !== undefined && v !== null) el.value = v;
+    });
+  }
+
+  function mmss(ms) {
+    var total = Math.max(0, Math.floor(ms / 1000));
+    var m = Math.floor(total / 60);
+    var s = total % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function renderTimer() {
+    if (!state) return;
+    var remain = state.endAt - Date.now();
+    timerEl.textContent = mmss(remain);
+    if (remain < 5 * 60 * 1000) timerEl.classList.add('timer-danger');
+    else timerEl.classList.remove('timer-danger');
+    if (remain <= 0) {
+      timerEl.textContent = '00:00';
+      clearInterval(timerInterval);
+      lockInputs();
+      doCheck(true);
+    }
+  }
+
+  function lockInputs() {
+    inputs.forEach(function (el) { el.disabled = true; });
+    timerEl.classList.add('timer-danger');
+    timerEl.textContent = '00:00';
+  }
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    if (state) {
+      renderTimer();
+      timerInterval = setInterval(renderTimer, 1000);
+    }
+  }
+
+  function setRushedExpired() {
+    if (state && state.endAt - Date.now() <= 0) lockInputs();
+  }
+
+  function validateAndRead() {
+    var values = [];
+    var firstInvalid = null;
+    var hasInvalid = false;
+    inputs.forEach(function (el, i) {
+      var max = TASKS[i].max;
+      var raw = el.value.trim();
+      if (raw === '')
